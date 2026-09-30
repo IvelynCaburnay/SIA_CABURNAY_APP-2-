@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Pet Dashboard</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+
+        body {
+            background-color: #dce6f2;
+            padding: 40px;
+        }
+
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+
+        /* =========================
+           PAGE HEADER
+        ========================= */
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+
+        .page-header h1 {
+            color: #0867c9;
+            font-size: 32px;
+        }
+
+
+        /* =========================
+           MAIN CARD
+        ========================= */
+
+        .card {
+            background-color: white;
+
+            border-radius: 10px;
+
+            padding: 25px;
+
+            box-shadow:
+                0 3px 12px rgba(0, 0, 0, 0.08);
+        }
+
+
+        /* =========================
+           CARD HEADER
+        ========================= */
+
+        .card-header {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 20px;
+        }
+
+
+        .card-header h2 {
+            color: #333;
+
+            font-size: 22px;
+
+            margin: 0;
+        }
+
+
+        /* =========================
+           ADD PET BUTTON
+        ========================= */
+
+        .add-button {
+            background-color: #0867c9;
+
+            color: white;
+
+            padding: 11px 18px;
+
+            border: none;
+
+            border-radius: 6px;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+
+        .add-button:hover {
+            background-color: #0755a5;
+        }
+
+
+        /* =========================
+           TABLE
+        ========================= */
+
+        table {
+            width: 100%;
+
+            border-collapse: collapse;
+        }
+
+
+        th {
+            background-color: #0867c9;
+
+            color: white;
+
+            padding: 12px;
+
+            text-align: left;
+
+            font-size: 14px;
+        }
+
+
+        td {
+            padding: 12px;
+
+            border-bottom: 1px solid #ddd;
+
+            font-size: 14px;
+
+            color: #333;
+        }
+
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+
+        .empty {
+            text-align: center;
+
+            padding: 30px;
+
+            color: #777;
+        }
+
+
+        /* =========================
+           MODAL BACKGROUND
+        ========================= */
+
+        .modal {
+            display: none;
+
+            position: fixed;
+
+            z-index: 1000;
+
+            left: 0;
+
+            top: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            background-color: rgba(30, 50, 70, 0.45);
+
+            align-items: center;
+
+            justify-content: center;
+        }
+
+
+        /* =========================
+           MODAL BOX
+        ========================= */
+
+        .modal-content {
+            background-color: white;
+
+            width: 430px;
+
+            max-width: 90%;
+
+            padding: 25px;
+
+            border-radius: 9px;
+
+            box-shadow:
+                0 8px 25px rgba(0, 0, 0, 0.25);
+
+            position: relative;
+        }
+
+
+        /* =========================
+           MODAL HEADER
+        ========================= */
+
+        .modal-header {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 20px;
+        }
+
+
+        .modal-header h2 {
+            color: #0867c9;
+
+            font-size: 22px;
+        }
+
+
+        .close {
+            color: #0867c9;
+
+            font-size: 28px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            line-height: 20px;
+        }
+
+
+        .close:hover {
+            color: #064d91;
+        }
+
+
+        /* =========================
+           FORM
+        ========================= */
+
+        .form-group {
+            margin-bottom: 13px;
+        }
+
+
+        .form-group label {
+            display: block;
+
+            margin-bottom: 6px;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            color: #333;
+        }
+
+
+        .form-control {
+            width: 100%;
+
+            padding: 10px 12px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 5px;
+
+            font-size: 14px;
+
+            outline: none;
+        }
+
+
+        .form-control:focus {
+            border-color: #0867c9;
+
+            box-shadow:
+                0 0 0 2px rgba(8, 103, 201, 0.1);
+        }
+
+
+        .error {
+            color: red;
+
+            font-size: 12px;
+
+            margin-top: 3px;
+        }
+
+
+        /* =========================
+           MODAL ADD BUTTON
+        ========================= */
+
+        .modal-button {
+            width: 100%;
+
+            padding: 11px;
+
+            margin-top: 8px;
+
+            background-color: #0867c9;
+
+            color: white;
+
+            border: none;
+
+            border-radius: 5px;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+
+        .modal-button:hover {
+            background-color: #0755a5;
+        }
+
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 900px) {
+
+            body {
+                padding: 20px;
+            }
+
+
+            .card {
+                overflow-x: auto;
+            }
+
+
+            table {
+                min-width: 1000px;
+            }
+
+        }
+
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- =========================
+         PAGE TITLE
+    ========================= -->
+
+    <div class="page-header">
+
+        <h1>
+            Pet Dashboard
+        </h1>
+
+    </div>
+
+
+    <!-- =========================
+         PET LIST CARD
+    ========================= -->
+
+    <div class="card">
+
+
+        <!-- CARD HEADER -->
+
+        <div class="card-header">
+
+            <h2>
+                Pet List
+            </h2>
+
+
+            <!-- ADD PET BUTTON -->
+
+            <button
+                type="button"
+                class="add-button"
+                onclick="openModal()"
+            >
+
+                + Add Pet
+
+            </button>
+
+        </div>
+
+
+        <!-- =========================
+             PET TABLE
+        ========================= -->
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Pet ID
+                    </th>
+
+                    <th>
+                        Pet Name
+                    </th>
+
+                    <th>
+                        Pet Type
+                    </th>
+
+                    <th>
+                        Age
+                    </th>
+
+                    <th>
+                        Breed
+                    </th>
+
+                    <th>
+                        Owner Name
+                    </th>
+
+                    <th>
+                        Contact Number
+                    </th>
+
+                    <th>
+                        Health Status
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+                {% for pet in pets %}
+
+                <tr>
+
+                    <td>
+                        {{ pet.pet_id }}
+                    </td>
+
+                    <td>
+                        {{ pet.pet_name }}
+                    </td>
+
+                    <td>
+                        {{ pet.pet_type }}
+                    </td>
+
+                    <td>
+                        {{ pet.age }}
+                    </td>
+
+                    <td>
+                        {{ pet.breed }}
+                    </td>
+
+                    <td>
+                        {{ pet.owner_name }}
+                    </td>
+
+                    <td>
+                        {{ pet.contact_number }}
+                    </td>
+
+                    <td>
+                        {{ pet.health_status }}
+                    </td>
+
+                </tr>
+
+
+                {% empty %}
+
+
+                <tr>
+
+                    <td
+                        colspan="8"
+                        class="empty"
+                    >
+
+                        No pets registered yet.
+
+                    </td>
+
+                </tr>
+
+
+                {% endfor %}
+
+
+            </tbody>
+
+        </table>
+
+
+    </div>
+
+
+</div>
+
+
+
+<!-- ==================================================
+     ADD PET MODAL
+================================================== -->
+
+<div
+    id="addPetModal"
+    class="modal"
+>
+
+
+    <div class="modal-content">
+
+
+        <!-- MODAL HEADER -->
+
+        <div class="modal-header">
+
+            <h2>
+                Add Pet
+            </h2>
+
+
+            <span
+                class="close"
+                onclick="closeModal()"
+            >
+
+                &times;
+
+            </span>
+
+        </div>
+
+
+        <!-- =========================
+             ADD PET FORM
+        ========================= -->
+
+        <form
+            method="POST"
+            action="{% url 'add_pet' %}"
+        >
+
+            {% csrf_token %}
+
+
+            <!-- PET NAME -->
+
+            <div class="form-group">
+
+                <label>
+                    Pet Name:
+                </label>
+
+                {{ form.pet_name }}
+
+                {% for error in form.pet_name.errors %}
+
+                    <div class="error">
+                        {{ error }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- PET TYPE -->
+
+            <div class="form-group">
+
+                <label>
+                    Pet Type:
+                </label>
+
+                {{ form.pet_type }}
+
+                {% for error in form.pet_type.errors %}
+
+                    <div class="error">
+                        {{ error }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- AGE -->
+
+            <div class="form-group">
+
+                <label>
+                    Age:
+                </label>
+
+                {{ form.age }}
+
+                {% for error in form.age.errors %}
+
+                    <div class="error">
+                        {{ error }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- BREED -->
+
+            <div class="form-group">
+
+                <label>
+                    Breed:
+                </label>
+
+                {{ form.breed }}
+
+                {% for error in form.breed.errors %}
+
+                    <div class="error">
+                        {{ error }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- OWNER NAME -->
+
+            <div class="form-group">
+
+                <label>
+                    Owner Name:
+                </label>
+
+                {{ form.owner_name }}
+
+                {% for error in form.owner_name.errors %}
+
+                    <div class="error">
+                        {{ error }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- CONTACT NUMBER -->
+
+            <div class="form-group">
+
+                <label>
+                    Contact Number:
+                </label>
+
+                {{ form.contact_number }}
+
+                {% for error in form.contact_number.errors %}
+
+                    <div class="error">
+                        {{ error }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- HEALTH STATUS -->
+
+            <div class="form-group">
+
+                <label>
+                    Health Status:
+                </label>
+
+                {{ form.health_status }}
+
+                {% for error in form.health_status.errors %}
+
+                    <div class="error">
+                        {{ error }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- SUBMIT -->
+
+            <button
+                type="submit"
+                class="modal-button"
+            >
+
+                Add Pet
+
+            </button>
+
+
+        </form>
+
+
+    </div>
+
+</div>
+
+
+
+<!-- ==================================================
+     JAVASCRIPT
+================================================== -->
+
+<script>
+
+
+    function openModal() {
+
+        document.getElementById("addPetModal").style.display = "flex";
+
+    }
+
+
+    function closeModal() {
+
+        document.getElementById("addPetModal").style.display = "none";
+
+    }
+
+
+    /* Close when clicking outside the modal */
+
+    window.onclick = function(event) {
+
+        const modal =
+            document.getElementById("addPetModal");
+
+
+        if (event.target === modal) {
+
+            closeModal();
+
+        }
+
+    };
+
+
+</script>
+
+
+</body>
+
+</html>
